@@ -3,18 +3,24 @@ import json
 
 
 def generate_markdown(insights_data):
-    md = "# Briefing Semanal - Inteligência de Loja\n\n"
+    md = "# Briefing Semanal - Inteligência Operacional de Loja\n\n"
 
+    # 1. Resumo Executivo
     md += "## 1. Resumo Executivo\n"
     for bullet in insights_data.get('resumo_executivo', []):
         md += f"- {bullet}\n"
 
-    md += "\n## 2. Insights e Recomendações\n"
+    # 2. Insights e Recomendações
+    md += "\n## 2. Insights Operacionais\n"
     for ins in insights_data.get('insights', []):
-        md += f"### {ins['titulo']} ({ins['categoria']})\n"
-        md += f"- **Observação:** {ins['observacao']}\n"
-        md += f"- **Implicação:** {ins['implicacao']}\n"
-        md += f"- **Recomendação:** {ins['recomendacao']} (Urgência: {ins['urgencia']})\n"
+        urgencia_icone = "🔴" if ins.get('urgencia', '').lower() == 'imediata' else "🟡"
+
+        md += f"### {urgencia_icone} {ins.get('titulo', 'Insight')} (Categoria: {ins.get('categoria', 'Geral').capitalize()})\n"
+        md += f"**O que os dados mostram:** {ins.get('observacao', '')}\n\n"
+        md += f"**Impacto Operacional:** {ins.get('implicacao', '')}\n\n"
+        md += f"**Acção Recomendada:** {ins.get('recomendacao', '')}\n\n"
+        md += f"> *Nível de Confiança da IA: {float(ins.get('confianca', 0)) * 100}% | Urgência: {ins.get('urgencia', '').upper()}*\n\n"
+        md += "---\n\n"
 
     return md
 
@@ -32,3 +38,4 @@ if __name__ == "__main__":
 
     with open(args.output, 'w', encoding='utf-8') as f:
         f.write(markdown_content)
+    print(f"✅ Relatório Semanal pronto! Verifica o ficheiro {args.output}")
